@@ -48,9 +48,8 @@ def build_argparser():
     :return: command line arguments
     """
     parser = ArgumentParser()
-    parser.add_argument("-m", "--model", required=False, type=str,
-                        help="Path to image or video file",
-                        default = "/home/workspace/intel/person-detection-retail-0013/FP32/person-detection-retail-0013.xml")
+    parser.add_argument("-m", "--model", required=True, type=str,
+                        help="Path to image or video file")
     parser.add_argument("-l", "--cpu_extension", required=False, type=str,
                         default="/opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so",
                         help="MKLDNN (CPU)-targeted custom layers."
@@ -103,12 +102,11 @@ def draw_boxes(frame, result, args, width, height):
             xmax = int(box[5] * width)
             ymax = int(box[6] * height)
             cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), args.color, 1)
-            log.info("people_count is {} for draw_boxes...".format(people_count))
             people_count = people_count + 1
     return frame, people_count
 
 
-def infer_on_stream(args, client):
+def infer_on_stream(args, client = None):
     """
     Initialize the inference network, stream video to network,
     and output stats and video.
@@ -136,6 +134,7 @@ def infer_on_stream(args, client):
     ### TODO: Load the model through `infer_network` ###
     n, c, h, w = infer_network.load_model(args.model, args.device, 
                                           current_request_id, args.cpu_extension)[1]
+    print(n,c,h,w)
 
     ### TODO: Handle the input stream ###
     
@@ -186,7 +185,7 @@ def infer_on_stream(args, client):
             
             ### Calculate and send relevant information on ###
             
-            inference_time_msg = "Time taken to infer: {:.2f}ms"\
+            inference_time_msg = "Time taken to infer: {:.3f}ms"\
                                .format(inference_time * 1000)
             
             cv2.putText(out_frame, inference_time_msg, (25, 25),
@@ -205,7 +204,8 @@ def infer_on_stream(args, client):
             # If a person leaves the room
             # We calculate his/her duration spent
             ### Topic "person/duration": key of "duration" ###
-            if people_count < last_count :
+            # Avoiding any kind of flicker by putting time difference to be atleast 1sec
+            if (people_count < last_count) and int(time.time() - start_time) >=1:
                 duration = int(time.time() - start_time)
                 # Push info
                 client.publish("person/duration",
@@ -242,7 +242,6 @@ def main():
     client = connect_mqtt()
     # Perform inference on the input stream
     infer_on_stream(args, client)
-
 
 if __name__ == '__main__':
     main()
