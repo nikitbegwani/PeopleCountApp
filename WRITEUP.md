@@ -23,9 +23,10 @@ In order to compare the model, I planned on to comparing them on the basis of th
 ## Assess Model Use Cases
 
 This framework can be used for alot of use cases and why it will be useful :-
-1. Counting number of people entering or leaving a store to determine the peak hours.
-2. Alarming the security in case someone is trying to trespass an area.
-3. Counting crowds in forbidden areas in a manufacturing unit to enforce safety rules and minimize health risks. 
+### Counting number of people entering or leaving a store to determine the peak hours.
+The app can be used to omonitor the foot fall in a store, where the camera can be placed at the enterance and we can calculate the number of people who entered the store. Once we have such statistics, we can leverage it by deciding when to have more staffs in the store, what are the peak hours, etc.
+### Alarming the security in case someone is trying to trespass an area.
+Trespassing a prohibited area is a problem and using the person detection technique, we can combat that. For example, we can monitor forests and know when a poacher enters the area. We can also determine the heavily poached segments of a forest using the same idea of count number of people. Using this, we can save the animals from getting poached by increasing the security in heavily poached areas.
 
 ## Assess Effects on End User Needs
 
