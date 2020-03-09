@@ -61,18 +61,27 @@ In investigating potential people counter models, I tried each of the following 
   
   - The model was insufficient for the app because...
   The prototext file was corrupted and threw `318:5 : Message type "mo_caffe.DropoutParameter" has no field named "scale_train".`
- 
+
   
   - I tried to improve the model for the app by...
   
     Tried fixing it by changing the prototxt url to "https://raw.githubusercontent.com/rbgirshick/py-faster-rcnn/master/models/pascal_voc/VGG16/faster_rcnn_end2end/test.prototxt"
     
-   Model Conversion is not ending. Its taking too long to convert.
+  
+ Model Conversion is not ending. Its taking too long to convert.
 Later on model got converted but the size was huge.
-
-- Model 3: [MobileNet-SSD V2]
-  - [https://github.com/C-Aniruddh/realtime_object_recognition]
+  
+- Model 3: [Yolo V3]
+  - [https://github.com/mystic123/tensorflow-yolo-v3]
   - I converted the model to an Intermediate Representation with the following arguments...
-  Same error as Model 1
+    - Step 1 :- obtained the weights and coco.names file from 
+      - Download COCO class names file: `wget https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names`
+      - Download and convert model weights:    
+        - Download binary file with desired weights: 
+          - Full weights: `wget https://pjreddie.com/media/files/yolov3.weights`
+    - Step 2 - Used `python3 convert_weights_pb.py --class_names coco.names --data_format NHWC --weights_file yolov3.weights` to obtain `frozen_darknet_yolov3_model.pb` file
+    - Step 3 - Converted the `frozen_darknet_yolov3_model.pb` file to `.xml` and `.bin` using `python /opt/intel/openvino/deployment_tools/model_optimizer/mo_tf.py --input_model frozen_darknet_yolov3_model.pb --tensorflow_use_custom_operations_config /opt/intel/openvino/deployment_tools/model_optimizer/extensions/front/tf/yolo_v3.json -b 1`
   - The model was insufficient for the app because...
+    Inference time was in order of ~1000ms even after using OpenVino
   - I tried to improve the model for the app by...
+    using yolo tiny version but still the inference time was high.
